@@ -101,56 +101,7 @@ No code changes required. No config. Just add the script and go.
 
 ## Explore in Metabase
 
-Install Metabase and connect it to your database:
+You can use Metabase’s visual query builder to explore your data—no SQL required!
 
-- **Self-host:** https://www.metabase.com/docs/latest/operations-guide/installing.html
-- **Try Cloud:** https://www.metabase.com/start
-
----
-
-## Example Metabase Queries
-
-```sql
--- Daily page views
-SELECT
-  DATE(timestamp) as date,
-  COUNT(*) as page_views
-FROM compass_events
-WHERE type = 'page_view'
-GROUP BY DATE(timestamp)
-ORDER BY date DESC;
-
--- Users by country
-SELECT
-  country,
-  COUNT(*) as views
-FROM compass_events
-WHERE country IS NOT NULL
-GROUP BY country
-ORDER BY views DESC;
-
--- Users by state
-SELECT
-  state,
-  country,
-  COUNT(*) as views
-FROM compass_events
-WHERE state IS NOT NULL
-GROUP BY state, country
-ORDER BY views DESC;
-
--- Users by city
-SELECT
-  city,
-  state,
-  country,
-  COUNT(*) as views
-FROM compass_events
-WHERE city IS NOT NULL
-GROUP BY city, state, country
-ORDER BY views DESC;
-```
-
----
-
-MIT Licensed
+[![Self-host Metabase](https://img.shields.io/badge/Self--host-Metabase-blue?logo=metabase)](https://www.metabase.com/docs/latest/operations-guide/installing.html)
+[![Try Metabase Cloud](https://img.shields.io/badge/Try%20Cloud-Metabase-brightgreen?logo=metabase)](https://www.metabase.com/start)
