@@ -34,11 +34,27 @@ Add this to your `<head>`:
 
 ### 4. Add the API route
 
-Create `pages/api/compass-event.js`:
+**For Next.js Pages Router** - Create `pages/api/compass-event.js`:
 
 ```js
 import { compassEventHandler } from "metabase-compass";
 export default compassEventHandler;
+```
+
+**For Next.js App Router** - Create `src/app/api/compass-event/route.ts`:
+
+```ts
+import { compassEventHandler } from "metabase-compass";
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const req = { method: 'POST', body };
+  const res = {
+    status: (code: number) => ({ json: (data: any) => new Response(JSON.stringify(data), { status: code }) }),
+    json: (data: any) => new Response(JSON.stringify(data))
+  };
+  return await compassEventHandler(req, res);
+}
 ```
 
 ### 5. Configure your database
@@ -68,6 +84,8 @@ CREATE TABLE compass_events (
   referrer TEXT,
   timestamp TIMESTAMPTZ DEFAULT NOW(),
   userAgent TEXT,
+  sessionid TEXT,
+  payload JSONB,
   ip TEXT,
   country TEXT,
   region TEXT,
