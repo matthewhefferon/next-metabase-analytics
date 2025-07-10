@@ -1,50 +1,39 @@
 {
   "name": "metabase-compass",
   "version": "0.1.0",
-  "description": "Drop-in analytics for your Next.js app with Metabase",
+  "description": "Simple web analytics for Metabase",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    },
+    "./compassEventHandler": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    }
+  },
   "files": [
-    "dist"
+    "dist/",
+    "public/"
   ],
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "prepublishOnly": "npm run build"
+    "dev": "rollup -c --watch",
+    "postinstall": "node scripts/setup.js"
   },
-  "keywords": [
-    "metabase",
-    "analytics",
-    "tracking",
-    "nextjs",
-    "postgres",
-    "supabase",
-    "neon",
-    "web-analytics",
-    "product-analytics"
-  ],
+  "keywords": ["analytics", "metabase", "web-analytics", "postgresql"],
   "author": "Your Name",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/metabase-compass.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/metabase-compass/issues"
-  },
-  "homepage": "https://github.com/yourusername/metabase-compass#readme",
-  "dependencies": {
-    "pg": "^8.11.0"
-  },
   "devDependencies": {
-    "rollup": "^3.0.0",
     "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
-    "rollup-plugin-terser": "^7.0.0"
+    "@rollup/plugin-terser": "^0.4.0",
+    "rollup": "^3.29.0"
   },
-  "peerDependencies": {
-    "next": ">=12.0.0",
-    "react": ">=17.0.0"
+  "dependencies": {
+    "pg": "^8.11.0"
   }
 }

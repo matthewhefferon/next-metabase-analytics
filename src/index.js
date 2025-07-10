@@ -6,9 +6,7 @@ export {
   trackClick,
   trackScroll,
   trackSignup,
-  trackLogin,
   trackPurchase,
-  trackCustom,
   EVENT_TYPES,
 } from "./track.js";
 

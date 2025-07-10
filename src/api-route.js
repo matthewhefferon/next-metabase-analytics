@@ -38,8 +38,7 @@ export default async function compassEventHandler(req, res) {
       referrer,
       timestamp: timestamp || new Date().toISOString(),
       userAgent,
-      sessionId,
-      payload: Object.keys(payload).length > 0 ? payload : null,
+      sessionid: sessionId, // Map to lowercase column name
       ip: location?.ip,
       country: location?.country,
       region: location?.region,
@@ -53,9 +52,9 @@ export default async function compassEventHandler(req, res) {
     // Insert event using native pg
     const query = `
       INSERT INTO compass_events (
-        type, path, referrer, timestamp, userAgent, sessionId, 
-        payload, ip, country, region, state, city, latitude, longitude, timezone
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        type, path, referrer, timestamp, userAgent, sessionid, 
+        ip, country, region, state, city, latitude, longitude, timezone
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
     `;
 
     const values = [
@@ -64,8 +63,7 @@ export default async function compassEventHandler(req, res) {
       eventData.referrer,
       eventData.timestamp,
       eventData.userAgent,
-      eventData.sessionId,
-      eventData.payload ? JSON.stringify(eventData.payload) : null,
+      eventData.sessionid,
       eventData.ip,
       eventData.country,
       eventData.region,

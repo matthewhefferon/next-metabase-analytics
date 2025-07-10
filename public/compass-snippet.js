@@ -1,12 +1,23 @@
 (function () {
+  // Generate or get existing session ID
+  function getSessionId() {
+    let sessionId = sessionStorage.getItem('compass_session_id');
+    if (!sessionId) {
+      sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem('compass_session_id', sessionId);
+    }
+    return sessionId;
+  }
+
   // Collect basic event data
   function getEventData() {
     return {
       type: "page_view",
       path: window.location.pathname,
-      referrer: document.referrer,
+      referrer: document.referrer || "direct",
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
+      sessionId: getSessionId(),
     };
   }
 
@@ -44,7 +55,7 @@
   // Track page view with location
   fetchLocation(function (location) {
     var event = getEventData();
-    for (var k in location) event[k] = location[k];
+    event.location = location; // Put location data in a location property
     sendEvent(event);
   });
 })();
