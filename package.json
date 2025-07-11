@@ -5,26 +5,37 @@
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "type": "module",
+  "bin": {
+    "metabase-compass-setup": "./scripts/setup.cjs"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.esm.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./compassEventHandler": {
       "import": "./dist/index.esm.js",
       "require": "./dist/index.js"
     }
   },
+  "types": "dist/index.d.ts",
   "files": [
     "dist/",
-    "public/"
+    "public/",
+    "scripts/"
   ],
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c --watch",
-    "postinstall": "node scripts/setup.js"
+    "postinstall": "node scripts/setup.cjs"
   },
-  "keywords": ["analytics", "metabase", "web-analytics", "postgresql"],
+  "keywords": [
+    "analytics",
+    "metabase",
+    "web-analytics",
+    "postgresql"
+  ],
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {

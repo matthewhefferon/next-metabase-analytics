@@ -10,17 +10,17 @@ Simple web analytics for your Next.js app with Metabase.
 npm install metabase-compass
 ```
 
-The setup script will automatically:
-- Copy the tracking snippet to `public/compass-snippet.js`
-- Create the API route at `src/app/api/compass-event/route.ts`
+### 2. Run the setup
 
-### 2. Add the script tag
-
-Add this to your `<head>` in `src/app/layout.tsx`:
-
-```tsx
-<script src="/compass-snippet.js"></script>
+```bash
+npx metabase-compass-setup
 ```
+
+This will automatically:
+
+- Copy the tracking snippet to `public/compass-snippet.js`
+- Create the API route at `pages/api/compass-event.js` (Pages Router) or `src/app/api/compass-event/route.ts` (App Router)
+- Add the script tag to your layout file
 
 ### 3. Set up your database
 
@@ -29,6 +29,12 @@ Add your `DATABASE_URL` to `.env.local`:
 ```bash
 DATABASE_URL=postgresql://user:password@localhost:5432/your_database
 ```
+
+**Database options:**
+
+- **Supabase**: [supabase.com](https://supabase.com)
+- **Neon**: [neon.tech](https://neon.tech)
+- **Self-hosted**: Any PostgreSQL server
 
 ### 4. Create the database table
 
