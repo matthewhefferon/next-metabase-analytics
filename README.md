@@ -1,4 +1,4 @@
-# 🧭 Metabase Compass
+# Next Metabase Analytics
 
 Simple web analytics for your Next.js app with Metabase.
 
@@ -7,19 +7,19 @@ Simple web analytics for your Next.js app with Metabase.
 ### 1. Install the package
 
 ```bash
-npm install metabase-compass
+npm install next-metabase-analytics
 ```
 
 ### 2. Run the setup
 
 ```bash
-npx metabase-compass-setup
+npx next-metabase-analytics-setup
 ```
 
 This will automatically:
 
-- Copy the tracking snippet to `public/compass-snippet.js`
-- Create the API route at `pages/api/compass-event.js` (Pages Router) or `src/app/api/compass-event/route.ts` (App Router)
+- Copy the tracking snippet to `public/next-analytics-snippet.js`
+- Create the API route at `pages/api/next-analytics-event.js` (Pages Router) or `src/app/api/next-analytics-event/route.ts` (App Router)
 - Add the script tag to your layout file
 
 ### 3. Set up your database
@@ -41,7 +41,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/your_database
 Run this SQL in your database:
 
 ```sql
-CREATE TABLE compass_events (
+CREATE TABLE next_analytics_events (
   id SERIAL PRIMARY KEY,
   type VARCHAR(50) NOT NULL,
   path VARCHAR(500) NOT NULL,
@@ -60,9 +60,9 @@ CREATE TABLE compass_events (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_compass_events_timestamp ON compass_events(timestamp);
-CREATE INDEX idx_compass_events_type ON compass_events(type);
-CREATE INDEX idx_compass_events_session ON compass_events(sessionid);
+CREATE INDEX idx_next_analytics_events_timestamp ON next_analytics_events(timestamp);
+CREATE INDEX idx_next_analytics_events_type ON next_analytics_events(type);
+CREATE INDEX idx_next_analytics_events_session ON next_analytics_events(sessionid);
 ```
 
 ---

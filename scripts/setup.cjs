@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-console.log("[metabase-compass setup] Script started");
+console.log("[next-metabase-analytics setup] Script started");
 
 const fs = require("fs");
 const path = require("path");
@@ -26,13 +26,13 @@ function createApiRoute(projectType) {
   const cwd = process.cwd();
   try {
     if (projectType === "app-router") {
-      // Always use app/api/compass-event/route.ts (never src/)
-      const routeDir = path.join(cwd, "app", "api", "compass-event");
+      // Always use app/api/next-analytics-event/route.ts (never src/)
+      const routeDir = path.join(cwd, "app", "api", "next-analytics-event");
       const routeFile = path.join(routeDir, "route.ts");
       if (!fs.existsSync(routeDir)) {
         fs.mkdirSync(routeDir, { recursive: true });
       }
-      const routeContent = `import { compassEventHandler } from "metabase-compass";
+      const routeContent = `import { analyticsEventHandler } from "next-metabase-analytics";
 import type { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       }),
       json: (data: any) => new Response(JSON.stringify(data)),
     };
-    const result = await compassEventHandler(req, res);
+    const result = await analyticsEventHandler(req, res);
     if (result instanceof Response) return result;
     // Always return a Response, even if handler returns nothing
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
@@ -56,57 +56,63 @@ export async function POST(request: NextRequest) {
 `;
       fs.writeFileSync(routeFile, routeContent);
       console.log(
-        "[metabase-compass setup] Created App Router API route: app/api/compass-event/route.ts"
+        "[next-metabase-analytics setup] Created App Router API route: app/api/next-analytics-event/route.ts"
       );
-      // Remove old src/app/api/compass-event/route.ts if it exists
+      // Remove old src/app/api/next-analytics-event/route.ts if it exists
       const oldRoute = path.join(
         cwd,
         "src",
         "app",
         "api",
-        "compass-event",
+        "next-analytics-event",
         "route.ts"
       );
       if (fs.existsSync(oldRoute)) {
         fs.rmSync(oldRoute, { force: true });
         // Optionally remove empty dirs
-        const oldDir = path.join(cwd, "src", "app", "api", "compass-event");
+        const oldDir = path.join(cwd, "src", "app", "api", "next-analytics-event");
         try {
           fs.rmdirSync(oldDir);
         } catch {}
       }
     } else {
-      const routeFile = path.join(cwd, "pages", "api", "compass-event.js");
+      const routeFile = path.join(cwd, "pages", "api", "next-analytics-event.js");
       const apiDir = path.dirname(routeFile);
       if (!fs.existsSync(apiDir)) {
         fs.mkdirSync(apiDir, { recursive: true });
       }
-      const routeContent = `import { compassEventHandler } from "metabase-compass";\nexport default compassEventHandler;\n`;
+      const routeContent = `import { analyticsEventHandler } from "next-metabase-analytics";\nexport default analyticsEventHandler;\n`;
       fs.writeFileSync(routeFile, routeContent);
       console.log(
-        "[metabase-compass setup] Created Pages Router API route: pages/api/compass-event.js"
+        "[next-metabase-analytics setup] Created Pages Router API route: pages/api/next-analytics-event.js"
       );
     }
   } catch (err) {
-    console.error("[metabase-compass setup] Error creating API route:", err);
+    console.error(
+      "[next-metabase-analytics setup] Error creating API route:",
+      err
+    );
   }
 }
 
 function copySnippet() {
   const cwd = process.cwd();
   const publicDir = path.join(cwd, "public");
-  const snippetDest = path.join(publicDir, "compass-snippet.js");
-  const snippetSrc = path.join(__dirname, "..", "public", "compass-snippet.js");
+  const snippetDest = path.join(publicDir, "next-analytics-snippet.js");
+  const snippetSrc = path.join(__dirname, "..", "public", "next-analytics-snippet.js");
   try {
     if (!fs.existsSync(publicDir)) {
       fs.mkdirSync(publicDir, { recursive: true });
     }
     fs.copyFileSync(snippetSrc, snippetDest);
     console.log(
-      "[metabase-compass setup] Copied tracking snippet to: public/compass-snippet.js"
+      "[next-metabase-analytics setup] Copied tracking snippet to: public/next-analytics-snippet.js"
     );
   } catch (err) {
-    console.error("[metabase-compass setup] Error copying snippet:", err);
+    console.error(
+      "[next-metabase-analytics setup] Error copying snippet:",
+      err
+    );
   }
 }
 
@@ -125,7 +131,7 @@ function addScriptTag(projectType) {
 
     if (!fs.existsSync(layoutFile)) {
       console.log(
-        "[metabase-compass setup] Layout file not found, you'll need to add the script tag manually"
+        "[next-metabase-analytics setup] Layout file not found, you'll need to add the script tag manually"
       );
       return;
     }
@@ -133,47 +139,53 @@ function addScriptTag(projectType) {
     let content = fs.readFileSync(layoutFile, "utf8");
 
     // Check if script tag already exists
-    if (content.includes("/compass-snippet.js")) {
+    if (content.includes("/next-analytics-snippet.js")) {
       console.log(
-        "[metabase-compass setup] Script tag already exists in layout file"
+        "[next-metabase-analytics setup] Script tag already exists in layout file"
       );
       return;
     }
 
-    // Add script tag to head
-    if (content.includes("<html")) {
-      // Find the html tag and add head with script
-      content = content.replace(
-        /<html([^>]*)>/,
-        '<html$1>\n      <head>\n        <script src="/compass-snippet.js"></script>\n      </head>'
-      );
+          // Add script tag to head
+      if (content.includes("<html")) {
+        // Find the html tag and add head with script
+        content = content.replace(
+          /<html([^>]*)>/,
+          '<html$1>\n      <head>\n        <script src="/next-analytics-snippet.js"></script>\n      </head>'
+        );
       fs.writeFileSync(layoutFile, content);
       console.log(
-        `[metabase-compass setup] Added script tag to: ${layoutFile}`
+        `[next-metabase-analytics setup] Added script tag to: ${layoutFile}`
       );
     } else {
       console.log(
-        "[metabase-compass setup] Could not find html tag, you'll need to add the script tag manually"
+        "[next-metabase-analytics setup] Could not find html tag, you'll need to add the script tag manually"
       );
     }
   } catch (err) {
-    console.error("[metabase-compass setup] Error adding script tag:", err);
+    console.error(
+      "[next-metabase-analytics setup] Error adding script tag:",
+      err
+    );
   }
 }
 
 function main() {
   try {
-    console.log("[metabase-compass setup] Running main setup...");
+    console.log("[next-metabase-analytics setup] Running main setup...");
     const projectType = detectProjectType();
     console.log(
-      `[metabase-compass setup] Detected project type: ${projectType}`
+      `[next-metabase-analytics setup] Detected project type: ${projectType}`
     );
     createApiRoute(projectType);
     copySnippet();
     addScriptTag(projectType);
-    console.log("[metabase-compass setup] Setup complete!");
+    console.log("[next-metabase-analytics setup] Setup complete!");
   } catch (error) {
-    console.error("[metabase-compass setup] Setup failed:", error.message);
+    console.error(
+      "[next-metabase-analytics setup] Setup failed:",
+      error.message
+    );
     process.exit(1);
   }
 }

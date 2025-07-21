@@ -1,10 +1,10 @@
 (function () {
   // Generate or get existing session ID
   function getSessionId() {
-    let sessionId = sessionStorage.getItem('compass_session_id');
+    let sessionId = sessionStorage.getItem('next_analytics_session_id');
     if (!sessionId) {
       sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      sessionStorage.setItem('compass_session_id', sessionId);
+      sessionStorage.setItem('next_analytics_session_id', sessionId);
     }
     return sessionId;
   }
@@ -49,7 +49,7 @@
 
   // Send event to API
   function sendEvent(event) {
-    navigator.sendBeacon("/api/compass-event", JSON.stringify(event));
+    navigator.sendBeacon("/api/next-analytics-event", JSON.stringify(event));
   }
 
   // Track page view with location

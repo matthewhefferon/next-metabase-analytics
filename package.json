@@ -1,12 +1,12 @@
 {
-  "name": "metabase-compass",
+  "name": "next-metabase-analytics",
   "version": "0.1.0",
   "description": "Simple web analytics for Metabase",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "type": "module",
   "bin": {
-    "metabase-compass-setup": "./scripts/setup.cjs"
+    "next-metabase-analytics-setup": "./scripts/setup.cjs"
   },
   "exports": {
     ".": {
@@ -14,7 +14,7 @@
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./compassEventHandler": {
+    "./analyticsEventHandler": {
       "import": "./dist/index.esm.js",
       "require": "./dist/index.js"
     }

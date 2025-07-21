@@ -1,1 +1,1 @@
-export declare function compassEventHandler(req: any, res: any): Promise<any>;
+export declare function analyticsEventHandler(req: any, res: any): Promise<any>;

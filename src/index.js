@@ -1,6 +1,6 @@
-// Main entry point for metabase-compass NPM package
+// Main entry point for next-metabase-analytics NPM package
 export {
-  initCompass,
+  initAnalytics,
   trackEvent,
   trackPageView,
   trackClick,
@@ -11,4 +11,4 @@ export {
 } from "./track.js";
 
 // Export API route handler
-export { default as compassEventHandler } from "./api-route.js";
+export { default as analyticsEventHandler } from "./api-route.js";
