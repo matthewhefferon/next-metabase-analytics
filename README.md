@@ -75,6 +75,10 @@ CREATE INDEX idx_next_analytics_events_type ON next_analytics_events(type);
 CREATE INDEX idx_next_analytics_events_session ON next_analytics_events(sessionid);
 ```
 
+**To delete all data:** `TRUNCATE TABLE next_analytics_events RESTART IDENTITY;`
+
+**To drop the table:** `DROP TABLE next_analytics_events CASCADE;`
+
 ---
 
 ## What gets tracked
@@ -85,8 +89,6 @@ CREATE INDEX idx_next_analytics_events_session ON next_analytics_events(sessioni
 - **Session ID** - Unique identifier for tracking user journeys (persists across page loads)
 - **User agent** - Browser and device info
 - **Timestamp** - When the event occurred
-
----
 
 ## Explore in Metabase
 
