@@ -36,8 +36,16 @@
     "web-analytics",
     "postgresql"
   ],
-  "author": "Your Name",
+  "author": "Matthew Hefferon",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matthewhefferon/next-metabase-analytics.git"
+  },
+  "bugs": {
+    "url": "https://github.com/matthewhefferon/next-metabase-analytics/issues"
+  },
+  "homepage": "https://github.com/matthewhefferon/next-metabase-analytics#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",

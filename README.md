@@ -2,6 +2,16 @@
 
 Simple web analytics for your Next.js app with Metabase.
 
+## Why use this?
+
+If you're building with Next.js and want simple, self-hosted analytics you can explore in Metabase — without using Google Analytics or complex tools — this package is for you.
+
+- ✅ **No external dependencies** - Uses your existing Postgres database
+- ✅ **Privacy-first** - Your data stays on your servers
+- ✅ **Metabase integration** - Visual dashboards without writing SQL
+- ✅ **Real-time insights** - See visitor behavior as it happens
+- ✅ **Fully open source** - No vendor lock-in or hidden costs
+
 ## Quick Start
 
 ### 1. Install the package
