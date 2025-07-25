@@ -22,12 +22,26 @@ function detectProjectType() {
   return "pages-router";
 }
 
+function detectAppDirectory() {
+  const cwd = process.cwd();
+  // Check if using src/app structure
+  if (fs.existsSync(path.join(cwd, "src", "app"))) {
+    return "src/app";
+  }
+  // Check if using app structure
+  if (fs.existsSync(path.join(cwd, "app"))) {
+    return "app";
+  }
+  // Default to app
+  return "app";
+}
+
 function createApiRoute(projectType) {
   const cwd = process.cwd();
   try {
     if (projectType === "app-router") {
-      // Always use app/api/next-analytics-event/route.ts (never src/)
-      const routeDir = path.join(cwd, "app", "api", "next-analytics-event");
+      const appDir = detectAppDirectory();
+      const routeDir = path.join(cwd, appDir, "api", "next-analytics-event");
       const routeFile = path.join(routeDir, "route.ts");
       if (!fs.existsSync(routeDir)) {
         fs.mkdirSync(routeDir, { recursive: true });
@@ -56,25 +70,8 @@ export async function POST(request: NextRequest) {
 `;
       fs.writeFileSync(routeFile, routeContent);
       console.log(
-        "[next-metabase-analytics setup] Created App Router API route: app/api/next-analytics-event/route.ts"
+        `[next-metabase-analytics setup] Created App Router API route: ${appDir}/api/next-analytics-event/route.ts`
       );
-      // Remove old src/app/api/next-analytics-event/route.ts if it exists
-      const oldRoute = path.join(
-        cwd,
-        "src",
-        "app",
-        "api",
-        "next-analytics-event",
-        "route.ts"
-      );
-      if (fs.existsSync(oldRoute)) {
-        fs.rmSync(oldRoute, { force: true });
-        // Optionally remove empty dirs
-        const oldDir = path.join(cwd, "src", "app", "api", "next-analytics-event");
-        try {
-          fs.rmdirSync(oldDir);
-        } catch {}
-      }
     } else {
       const routeFile = path.join(cwd, "pages", "api", "next-analytics-event.js");
       const apiDir = path.dirname(routeFile);
@@ -121,10 +118,8 @@ function addScriptTag(projectType) {
   try {
     let layoutFile;
     if (projectType === "app-router") {
-      layoutFile = path.join(cwd, "app", "layout.tsx");
-      if (!fs.existsSync(layoutFile)) {
-        layoutFile = path.join(cwd, "src", "app", "layout.tsx");
-      }
+      const appDir = detectAppDirectory();
+      layoutFile = path.join(cwd, appDir, "layout.tsx");
     } else {
       layoutFile = path.join(cwd, "pages", "_app.tsx");
     }
