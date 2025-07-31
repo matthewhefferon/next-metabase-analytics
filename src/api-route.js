@@ -1,12 +1,22 @@
 import { Pool } from "pg";
 
-// Create database connection pool
+// Create database connection pool with better error handling
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  max: 10, // Limit concurrent connections
+  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+  connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
+});
+
+// Handle pool errors
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
 });
 
 // Handle analytics events
 async function analyticsEventHandler(req, res) {
+  let client;
+
   try {
     // Only handle POST requests
     if (req.method !== "POST") {
@@ -23,21 +33,30 @@ async function analyticsEventHandler(req, res) {
     // Extract location data if present
     const location = event.location || {};
 
+    // Get a client from the pool
+    client = await pool.connect();
+
     // Insert event into database
     const query = `
       INSERT INTO next_analytics_events (
-        type, path, referrer, timestamp, userAgent, sessionid,
-        ip, country, region, state, city, latitude, longitude, timezone
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+        type, path, url, title, referrer, timestamp, sessionid,
+        anonymous_id, ip, country, region, state, city, latitude, longitude, timezone,
+        device_type, browser, os, screen_resolution, page_load_time,
+        utm_source, utm_medium, utm_campaign, utm_term, utm_content,
+        gclid, fbclid, ref, element, element_text, element_id, element_class, href,
+        form_id, form_action, form_method
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36)
     `;
 
     const values = [
       event.type,
       event.path,
+      event.url || null,
+      event.title || null,
       event.referrer || null,
       event.timestamp,
-      event.userAgent || null,
       event.sessionId || null,
+      event.anonymous_id || null,
       location.ip || null,
       location.country || null,
       location.region || null,
@@ -46,14 +65,51 @@ async function analyticsEventHandler(req, res) {
       location.latitude || null,
       location.longitude || null,
       location.timezone || null,
+      event.device_type || null,
+      event.browser || null,
+      event.os || null,
+      event.screen_resolution || null,
+      event.page_load_time || null,
+      event.utm_source || null,
+      event.utm_medium || null,
+      event.utm_campaign || null,
+      event.utm_term || null,
+      event.utm_content || null,
+      event.gclid || null,
+      event.fbclid || null,
+      event.ref || null,
+      event.element || null,
+      event.element_text || null,
+      event.element_id || null,
+      event.element_class || null,
+      event.href || null,
+      event.form_id || null,
+      event.form_action || null,
+      event.form_method || null,
     ];
 
-    await pool.query(query, values);
+    await client.query(query, values);
 
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Analytics event error:", error);
+
+    // Check if it's a connection error
+    if (error.code === "XX000" || error.message.includes("db_termination")) {
+      console.error(
+        "Database connection terminated, attempting to reconnect..."
+      );
+      return res
+        .status(503)
+        .json({ error: "Database temporarily unavailable" });
+    }
+
     return res.status(500).json({ error: "Internal server error" });
+  } finally {
+    // Always release the client back to the pool
+    if (client) {
+      client.release();
+    }
   }
 }
 
