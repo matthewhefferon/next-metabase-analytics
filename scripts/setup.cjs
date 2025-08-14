@@ -73,7 +73,12 @@ export async function POST(request: NextRequest) {
         `[next-metabase-analytics setup] Created App Router API route: ${appDir}/api/next-analytics-event/route.ts`
       );
     } else {
-      const routeFile = path.join(cwd, "pages", "api", "next-analytics-event.js");
+      const routeFile = path.join(
+        cwd,
+        "pages",
+        "api",
+        "next-analytics-event.js"
+      );
       const apiDir = path.dirname(routeFile);
       if (!fs.existsSync(apiDir)) {
         fs.mkdirSync(apiDir, { recursive: true });
@@ -96,7 +101,12 @@ function copySnippet() {
   const cwd = process.cwd();
   const publicDir = path.join(cwd, "public");
   const snippetDest = path.join(publicDir, "next-analytics-snippet.js");
-  const snippetSrc = path.join(__dirname, "..", "public", "next-analytics-snippet.js");
+  const snippetSrc = path.join(
+    __dirname,
+    "..",
+    "public",
+    "next-analytics-snippet.js"
+  );
   try {
     if (!fs.existsSync(publicDir)) {
       fs.mkdirSync(publicDir, { recursive: true });
@@ -141,13 +151,27 @@ function addScriptTag(projectType) {
       return;
     }
 
-          // Add script tag to head
-      if (content.includes("<html")) {
-        // Find the html tag and add head with script
+    // Add script tag to head
+    if (content.includes("<html")) {
+      if (projectType === "app-router") {
+        // For App Router, use Next.js Script component
+        if (!content.includes("import Script")) {
+          content = content.replace(
+            /import ([^;]+);/,
+            'import $1;\nimport Script from "next/script";'
+          );
+        }
+        content = content.replace(
+          /<html([^>]*)>/,
+          '<html$1>\n      <head>\n        <Script\n          src="/next-analytics-snippet.js"\n          strategy="afterInteractive"\n          id="next-analytics"\n        />\n      </head>'
+        );
+      } else {
+        // For Pages Router, use regular script tag
         content = content.replace(
           /<html([^>]*)>/,
           '<html$1>\n      <head>\n        <script src="/next-analytics-snippet.js"></script>\n      </head>'
         );
+      }
       fs.writeFileSync(layoutFile, content);
       console.log(
         `[next-metabase-analytics setup] Added script tag to: ${layoutFile}`

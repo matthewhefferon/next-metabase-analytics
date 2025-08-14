@@ -34,6 +34,8 @@ This will automatically:
 
 ### 3. Set up your database
 
+### 4. Create the database table
+
 Add your `DATABASE_URL` to `.env.local`:
 
 ```bash
@@ -46,7 +48,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/your_database
 - **Neon**: [neon.tech](https://neon.tech)
 - **Self-hosted**: Any PostgreSQL server
 
-### 4. Create the database table
+### 5. Create the database table
 
 Run this SQL in your database:
 
@@ -85,6 +87,11 @@ CREATE TABLE next_analytics_events (
   -- Performance metrics
   page_load_time INTEGER, -- Load time in milliseconds
 
+  -- Session tracking
+  session_start TIMESTAMP WITH TIME ZONE, -- When session began
+  session_end TIMESTAMP WITH TIME ZONE, -- When session ended
+  session_duration INTEGER -- Session duration in seconds
+
   -- Marketing attribution (UTM parameters)
   utm_source VARCHAR(200), -- Traffic source (google, facebook)
   utm_medium VARCHAR(200), -- Marketing medium (cpc, email)
@@ -105,10 +112,6 @@ CREATE INDEX idx_next_analytics_events_anonymous ON next_analytics_events(anonym
 CREATE INDEX idx_next_analytics_events_utm_campaign ON next_analytics_events(utm_campaign);
 CREATE INDEX idx_next_analytics_events_utm_source ON next_analytics_events(utm_source);
 ```
-
-**To delete all data:** `TRUNCATE TABLE next_analytics_events RESTART IDENTITY;`
-
-**To drop the table:** `DROP TABLE next_analytics_events CASCADE;`
 
 **To delete all data:** `TRUNCATE TABLE next_analytics_events RESTART IDENTITY;`
 
@@ -158,9 +161,10 @@ CREATE INDEX idx_next_analytics_events_utm_source ON next_analytics_events(utm_s
 ### Performance
 
 - **Page load time** - How long pages take to load (in milliseconds)
+- **Session duration** - How long users stay on your site (in seconds)
 - **Timestamp** - When each event occurred
 
-## Explore in Metabase
+### 6. Explore in Metabase
 
 You can use Metabase's visual query builder to explore your data - no SQL required!
 

@@ -25,6 +25,11 @@ async function analyticsEventHandler(req, res) {
 
     const event = req.body;
 
+    // Log in development only
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[Analytics] ${event.type} event from ${event.path}`);
+    }
+
     // Validate required fields
     if (!event.type || !event.path || !event.timestamp) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -42,9 +47,10 @@ async function analyticsEventHandler(req, res) {
         type, path, url, title, referrer, timestamp, sessionid,
         anonymous_id, country, region, state, city, latitude, longitude, timezone,
         device_type, browser, os, page_load_time,
+        session_start, session_end, session_duration,
         utm_source, utm_medium, utm_campaign, utm_term, utm_content,
         gclid, fbclid, ref
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30)
     `;
 
     const values = [
@@ -67,6 +73,9 @@ async function analyticsEventHandler(req, res) {
       event.browser || null,
       event.os || null,
       event.page_load_time || null,
+      event.session_start || null,
+      event.session_end || null,
+      event.session_duration || null,
       event.utm_source || null,
       event.utm_medium || null,
       event.utm_campaign || null,
@@ -81,12 +90,13 @@ async function analyticsEventHandler(req, res) {
 
     return res.status(200).json({ success: true });
   } catch (error) {
+    // Always log errors (both development and production)
     console.error("Analytics event error:", error);
 
     // Check if it's a connection error
     if (error.code === "XX000" || error.message.includes("db_termination")) {
       console.error(
-        "Database connection terminated, attempting to reconnect..."
+        "[Analytics] Database connection terminated, attempting to reconnect..."
       );
       return res
         .status(503)

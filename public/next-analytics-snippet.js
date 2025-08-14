@@ -6,8 +6,40 @@
       sessionId =
         "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
       sessionStorage.setItem("next_analytics_session_id", sessionId);
+      // Store session start time
+      sessionStorage.setItem(
+        "next_analytics_session_start",
+        Date.now().toString()
+      );
     }
     return sessionId;
+  }
+
+  // Get session timing data
+  function getSessionTiming() {
+    const sessionStart = sessionStorage.getItem("next_analytics_session_start");
+    const now = Date.now();
+
+    if (sessionStart) {
+      const startTime = parseInt(sessionStart);
+      const duration = Math.floor((now - startTime) / 1000); // Convert to seconds
+
+      // 30-minute timeout (1800 seconds)
+      const maxDuration = 30 * 60;
+      const actualDuration = Math.min(duration, maxDuration);
+
+      return {
+        session_start: new Date(startTime).toISOString(),
+        session_end: new Date(now).toISOString(),
+        session_duration: actualDuration,
+      };
+    }
+
+    return {
+      session_start: null,
+      session_end: null,
+      session_duration: null,
+    };
   }
 
   // Generate or get existing anonymous ID
@@ -86,6 +118,7 @@
     const { browser, os } = parseUserAgent();
     const urlParams = getUrlParams();
     const performance = getPerformanceMetrics();
+    const sessionTiming = getSessionTiming();
 
     return {
       type: "page_view",
@@ -101,6 +134,7 @@
       os: os,
       ...urlParams,
       ...performance,
+      ...sessionTiming,
     };
   }
 
@@ -160,13 +194,17 @@
     });
 
     // Method 2: Use Next.js router events if available
-    if (window.next && window.next.router) {
-      window.next.router.events.on("routeChangeComplete", function (url) {
-        if (url !== currentPath) {
-          currentPath = url;
-          trackPageView();
-        }
-      });
+    if (window.next && window.next.router && window.next.router.events) {
+      try {
+        window.next.router.events.on("routeChangeComplete", function (url) {
+          if (url !== currentPath) {
+            currentPath = url;
+            trackPageView();
+          }
+        });
+      } catch (error) {
+        console.warn("Next.js router events not available:", error);
+      }
     }
 
     // Method 3: Poll for path changes (fallback)
