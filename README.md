@@ -54,7 +54,7 @@ Run this SQL in your database:
 CREATE TABLE next_analytics_events (
   -- Core event identification
   id SERIAL PRIMARY KEY,
-  type VARCHAR(50) NOT NULL, -- 'page_view', 'click', 'form_submit'
+  type VARCHAR(50) NOT NULL, -- 'page_view'
   timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
@@ -69,7 +69,6 @@ CREATE TABLE next_analytics_events (
   anonymous_id VARCHAR(100), -- Cross-session user tracking
 
   -- Location data
-  ip VARCHAR(45),
   country VARCHAR(100),
   region VARCHAR(100), -- International regions
   state VARCHAR(100), -- US states
@@ -82,7 +81,6 @@ CREATE TABLE next_analytics_events (
   device_type VARCHAR(20), -- 'mobile', 'desktop', 'tablet'
   browser VARCHAR(50), -- 'Chrome', 'Safari', 'Firefox'
   os VARCHAR(50), -- 'Windows', 'macOS', 'iOS'
-  screen_resolution VARCHAR(20), -- '1920x1080'
 
   -- Performance metrics
   page_load_time INTEGER, -- Load time in milliseconds
@@ -97,19 +95,7 @@ CREATE TABLE next_analytics_events (
   -- Ad platform tracking
   gclid VARCHAR(200), -- Google Ads click ID
   fbclid VARCHAR(200), -- Facebook Ads click ID
-  ref VARCHAR(200), -- Custom referrer parameter
-
-  -- Click tracking fields
-  element VARCHAR(50), -- Element type ('button', 'a')
-  element_text VARCHAR(200), -- Button/link text ('Sign Up', 'Learn More')
-  element_id VARCHAR(100), -- Element ID attribute ('signup-btn', 'hero-cta')
-  element_class VARCHAR(200), -- Element class names ('btn-primary', 'cta-button')
-  href VARCHAR(500), -- Link destination URL
-
-  -- Form tracking fields
-  form_id VARCHAR(100), -- Form ID attribute
-  form_action VARCHAR(500), -- Form submission URL
-  form_method VARCHAR(10) -- Form method ('GET', 'POST')
+  ref VARCHAR(200) -- Custom referrer parameter
 );
 
 CREATE INDEX idx_next_analytics_events_timestamp ON next_analytics_events(timestamp);
@@ -118,9 +104,11 @@ CREATE INDEX idx_next_analytics_events_session ON next_analytics_events(sessioni
 CREATE INDEX idx_next_analytics_events_anonymous ON next_analytics_events(anonymous_id);
 CREATE INDEX idx_next_analytics_events_utm_campaign ON next_analytics_events(utm_campaign);
 CREATE INDEX idx_next_analytics_events_utm_source ON next_analytics_events(utm_source);
-CREATE INDEX idx_next_analytics_events_element ON next_analytics_events(element);
-CREATE INDEX idx_next_analytics_events_form_id ON next_analytics_events(form_id);
 ```
+
+**To delete all data:** `TRUNCATE TABLE next_analytics_events RESTART IDENTITY;`
+
+**To drop the table:** `DROP TABLE next_analytics_events CASCADE;`
 
 **To delete all data:** `TRUNCATE TABLE next_analytics_events RESTART IDENTITY;`
 
@@ -133,8 +121,6 @@ CREATE INDEX idx_next_analytics_events_form_id ON next_analytics_events(form_id)
 ### Event Types
 
 - **Page views** - Every page load and client-side navigation
-- **Click tracking** - Button and link clicks with details (text, ID, class, href)
-- **Form submissions** - Form submissions with metadata (ID, action, method)
 
 ### User & Session Data
 
@@ -146,7 +132,6 @@ CREATE INDEX idx_next_analytics_events_form_id ON next_analytics_events(form_id)
 - **Device type** - Mobile, desktop, or tablet
 - **Browser** - Chrome, Safari, Firefox, Edge, Opera
 - **Operating system** - Windows, macOS, Linux, Android, iOS
-- **Screen resolution** - User's screen dimensions
 
 ### Page Context
 
@@ -163,7 +148,6 @@ CREATE INDEX idx_next_analytics_events_form_id ON next_analytics_events(form_id)
 
 ### Location Data
 
-- **IP address** - Visitor's IP address
 - **Country** - Visitor's country
 - **Region** - International regions
 - **State** - US states and other state-level divisions

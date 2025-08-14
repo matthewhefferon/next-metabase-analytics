@@ -40,12 +40,11 @@ async function analyticsEventHandler(req, res) {
     const query = `
       INSERT INTO next_analytics_events (
         type, path, url, title, referrer, timestamp, sessionid,
-        anonymous_id, ip, country, region, state, city, latitude, longitude, timezone,
-        device_type, browser, os, screen_resolution, page_load_time,
+        anonymous_id, country, region, state, city, latitude, longitude, timezone,
+        device_type, browser, os, page_load_time,
         utm_source, utm_medium, utm_campaign, utm_term, utm_content,
-        gclid, fbclid, ref, element, element_text, element_id, element_class, href,
-        form_id, form_action, form_method
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36)
+        gclid, fbclid, ref
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)
     `;
 
     const values = [
@@ -57,7 +56,6 @@ async function analyticsEventHandler(req, res) {
       event.timestamp,
       event.sessionId || null,
       event.anonymous_id || null,
-      location.ip || null,
       location.country || null,
       location.region || null,
       location.state || null,
@@ -68,7 +66,6 @@ async function analyticsEventHandler(req, res) {
       event.device_type || null,
       event.browser || null,
       event.os || null,
-      event.screen_resolution || null,
       event.page_load_time || null,
       event.utm_source || null,
       event.utm_medium || null,
@@ -78,14 +75,6 @@ async function analyticsEventHandler(req, res) {
       event.gclid || null,
       event.fbclid || null,
       event.ref || null,
-      event.element || null,
-      event.element_text || null,
-      event.element_id || null,
-      event.element_class || null,
-      event.href || null,
-      event.form_id || null,
-      event.form_action || null,
-      event.form_method || null,
     ];
 
     await client.query(query, values);

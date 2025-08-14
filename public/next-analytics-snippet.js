@@ -82,28 +82,25 @@
   }
 
   // Collect basic event data
-  function getEventData(type = "page_view", additionalData = {}) {
+  function getEventData() {
     const { browser, os } = parseUserAgent();
     const urlParams = getUrlParams();
     const performance = getPerformanceMetrics();
 
     return {
-      type: type,
+      type: "page_view",
       path: window.location.pathname,
       url: window.location.href,
       title: document.title,
       referrer: document.referrer || "direct",
       timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
       sessionId: getSessionId(),
       anonymous_id: getAnonymousId(),
       device_type: getDeviceType(),
       browser: browser,
       os: os,
-      screen_resolution: `${screen.width}x${screen.height}`,
       ...urlParams,
       ...performance,
-      ...additionalData,
     };
   }
 
@@ -116,7 +113,6 @@
         try {
           var data = JSON.parse(xhr.responseText);
           cb({
-            ip: data.ip,
             country: data.country_name,
             region: data.region,
             state: data.region, // For US, region and state are the same
@@ -141,36 +137,7 @@
   // Track page view with location
   function trackPageView() {
     fetchLocation(function (location) {
-      var event = getEventData("page_view");
-      event.location = location;
-      sendEvent(event);
-    });
-  }
-
-  // Track click events
-  function trackClick(element, data = {}) {
-    fetchLocation(function (location) {
-      var event = getEventData("click", {
-        element: element,
-        element_text: data.text || null,
-        element_id: data.id || null,
-        element_class: data.class || null,
-        ...data,
-      });
-      event.location = location;
-      sendEvent(event);
-    });
-  }
-
-  // Track form submissions
-  function trackFormSubmit(form, data = {}) {
-    fetchLocation(function (location) {
-      var event = getEventData("form_submit", {
-        form_id: data.id || null,
-        form_action: data.action || null,
-        form_method: data.method || null,
-        ...data,
-      });
+      var event = getEventData();
       event.location = location;
       sendEvent(event);
     });
@@ -209,46 +176,5 @@
         trackPageView();
       }
     }, 100);
-
-    // Track click events
-    document.addEventListener("click", function (e) {
-      const target = e.target;
-      const tagName = target.tagName.toLowerCase();
-
-      // Track button and link clicks (meaningful user actions)
-      if (
-        tagName === "button" ||
-        tagName === "a" ||
-        target.closest("button") ||
-        target.closest("a")
-      ) {
-        const element =
-          target.closest("button") || target.closest("a") || target;
-        const text = element.textContent?.trim().substring(0, 100) || null;
-        const id = element.id || null;
-        const className = element.className || null;
-
-        trackClick(tagName, {
-          text: text,
-          id: id,
-          class: className,
-          href: element.href || null,
-        });
-      }
-    });
-
-    // Track form submissions
-    document.addEventListener("submit", function (e) {
-      const form = e.target;
-      const formId = form.id || null;
-      const formAction = form.action || null;
-      const formMethod = form.method || null;
-
-      trackFormSubmit(form, {
-        id: formId,
-        action: formAction,
-        method: formMethod,
-      });
-    });
   }
 })();
